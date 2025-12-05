@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses - LMS</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-brand">🎓 LMS</a>
+            <ul class="navbar-menu">
+                <li><a href="courses.html" class="navbar-link">Courses</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Courses Section -->
+    <section class="py-5">
+        <div class="container">
+            <h1 class="text-center mb-3">Explore Our Courses</h1>
+            <p class="text-center mb-3" style="font-size: 1.125rem;">
+                Choose from our selection of expertly crafted courses
+            </p>
+
+            <div id="coursesGrid" class="grid grid-3">
+                <!-- Courses will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        const coursesGrid = document.getElementById('coursesGrid');
+
+        async function loadCourses() {
+            showLoading(coursesGrid);
+
+            try {
+                const courses = await api.courses.getAll();
+
+                if (courses.length === 0) {
+                    coursesGrid.innerHTML = '<p class="text-center">No courses available yet.</p>';
+                    return;
+                }
+
+                coursesGrid.innerHTML = courses.map(course => `
+          <div class="card">
+            <div class="badge badge-primary mb-1">${course.category}</div>
+            <h3>${course.title}</h3>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: var(--spacing-sm);">
+              By ${course.instructor.name}
+            </p>
+            <p>${course.description.substring(0, 120)}...</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-md);">
+              <div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-light);">
+                  ${formatCurrency(course.price)}
+                </div>
+                <div style="font-size: 0.875rem; color: var(--text-muted);">
+                  ⏱️ ${course.duration} • 👥 ${course.enrollmentCount} enrolled
+                </div>
+              </div>
+            </div>
+            <button onclick="viewCourse('${course._id}')" class="btn btn-primary mt-2" style="width: 100%;">
+              View Details
+            </button>
+          </div>
+        `).join('');
+            } catch (error) {
+                coursesGrid.innerHTML = '<p class="text-center">Failed to load courses.</p>';
+                console.error(error);
+            }
+        }
+
+        function viewCourse(courseId) {
+            window.location.href = `course-details.html?id=${courseId}`;
+        }
+
+        loadCourses();
+    </script>
+</body>
+
+</html>

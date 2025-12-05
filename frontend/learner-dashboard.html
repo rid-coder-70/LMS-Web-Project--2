@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learner Dashboard - LMS</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-brand">🎓 LMS</a>
+            <ul class="navbar-menu">
+                <li><a href="courses.html" class="navbar-link">Browse Courses</a></li>
+                <li><a href="learner-dashboard.html" class="navbar-link">Dashboard</a></li>
+                <li><button onclick="logout()" class="btn btn-outline">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Dashboard -->
+    <section class="py-5">
+        <div class="container">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                <div>
+                    <h1 id="welcomeText">Welcome back!</h1>
+                    <p id="balanceText" style="font-size: 1.125rem; color: var(--text-muted);"></p>
+                </div>
+                <a href="courses.html" class="btn btn-primary">Browse More Courses</a>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-3 mb-3">
+                <div class="card card-glass text-center">
+                    <h3 id="enrolledCount" class="text-gradient">0</h3>
+                    <p>Enrolled Courses</p>
+                </div>
+                <div class="card card-glass text-center">
+                    <h3 id="completedCount" class="text-gradient">0</h3>
+                    <p>Completed</p>
+                </div>
+                <div class="card card-glass text-center">
+                    <h3 id="certificatesCount" class="text-gradient">0</h3>
+                    <p>Certificates</p>
+                </div>
+            </div>
+
+            <!-- My Enrollments -->
+            <div class="card mb-3">
+                <h2 class="mb-2">My Courses</h2>
+                <div id="enrollmentsList" class="grid grid-2">
+                    <!-- Enrollments will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Certificates -->
+            <div class="card mb-3">
+                <h2 class="mb-2">My Certificates</h2>
+                <div id="certificatesList">
+                    <!-- Certificates will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="card">
+                <h2 class="mb-2">Recent Transactions</h2>
+                <div id="transactionsList">
+                    <!-- Transactions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        protectPage();
+
+        const user = getUser();
+
+        if (!user || user.role !== 'learner') {
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('welcomeText').textContent = `Welcome back, ${user.name}!`;
+
+        async function loadDashboard() {
+            // Load user info
+            const userInfo = await api.auth.getMe();
+            document.getElementById('balanceText').textContent = `Balance: ${formatCurrency(userInfo.balance)}`;
+
+            // Load enrollments
+            const enrollments = await api.enrollments.getMy();
+            document.getElementById('enrolledCount').textContent = enrollments.length;
+            document.getElementById('completedCount').textContent = enrollments.filter(e => e.completionStatus === 'completed').length;
+
+            const enrollmentsList = document.getElementById('enrollmentsList');
+            if (enrollments.length === 0) {
+                enrollmentsList.innerHTML = '<p>No courses enrolled yet. <a href="courses.html">Browse courses</a></p>';
+            } else {
+                enrollmentsList.innerHTML = enrollments.map(enrollment => `
+          <div class="card-glass" style="padding: var(--spacing-md);">
+            <h4>${enrollment.course.title}</h4>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">
+              Instructor: ${enrollment.course.instructor.name}
+            </p>
+            <div style="margin: var(--spacing-sm) 0;">
+              ${enrollment.completionStatus === 'completed'
+                        ? '<span class="badge badge-success">Completed ✓</span>'
+                        : '<span class="badge badge-warning">In Progress</span>'}
+            </div>
+            ${enrollment.completionStatus !== 'completed' ? `
+              <button onclick="completeCourse('${enrollment._id}')" class="btn btn-success" style="width: 100%; margin-top: var(--spacing-sm);">
+                Mark as Complete
+              </button>
+            ` : ''}
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: var(--spacing-sm);">
+              Enrolled: ${formatDate(enrollment.enrolledAt)}
+            </p>
+          </div>
+        `).join('');
+            }
+
+            // Load certificates
+            const certificates = await api.certificates.getMy();
+            document.getElementById('certificatesCount').textContent = certificates.length;
+
+            const certificatesList = document.getElementById('certificatesList');
+            if (certificates.length === 0) {
+                certificatesList.innerHTML = '<p>No certificates yet. Complete a course to earn one!</p>';
+            } else {
+                certificatesList.innerHTML = certificates.map(cert => `
+          <div class="card-glass" style="padding: var(--spacing-md); margin-bottom: var(--spacing-sm); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h4>🏆 ${cert.course.title}</h4>
+              <p style="font-size: 0.875rem; color: var(--text-muted);">
+                Certificate ID: ${cert.certificateId}
+              </p>
+              <p style="font-size: 0.875rem; color: var(--text-muted);">
+                Issued: ${formatDate(cert.issuedAt)}
+              </p>
+            </div>
+            <span class="badge badge-success">Certified</span>
+          </div>
+        `).join('');
+            }
+
+            // Load transactions
+            const transactions = await api.transactions.getMy();
+            const transactionsList = document.getElementById('transactionsList');
+
+            if (transactions.length === 0) {
+                transactionsList.innerHTML = '<p>No transactions yet.</p>';
+            } else {
+                transactionsList.innerHTML = transactions.slice(0, 5).map(txn => `
+          <div class="card-glass" style="padding: var(--spacing-md); margin-bottom: var(--spacing-sm); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h4 style="font-size: 1rem;">${txn.course.title}</h4>
+              <p style="font-size: 0.875rem; color: var(--text-muted);">
+                ${txn.transactionType} • ${formatDate(txn.createdAt)}
+              </p>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 1.25rem; font-weight: 700; color: ${txn.from._id === user._id ? 'var(--danger)' : 'var(--success)'};">
+                ${txn.from._id === user._id ? '-' : '+'}${formatCurrency(txn.amount)}
+              </div>
+              <span class="badge badge-success">${txn.status}</span>
+            </div>
+          </div>
+        `).join('');
+            }
+        }
+
+        async function completeCourse(enrollmentId) {
+            try {
+                const result = await api.enrollments.complete(enrollmentId);
+
+                if (result.certificate) {
+                    showToast('🎉 Congratulations! Certificate issued!', 'success');
+                    loadDashboard(); // Reload dashboard
+                } else {
+                    showToast(result.message || 'Failed to complete course', 'error');
+                }
+            } catch (error) {
+                showToast('An error occurred', 'error');
+                console.error(error);
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+
+</html>

@@ -247,10 +247,69 @@ GET    /api/certificates/:id           # Get certificate by ID
 - amount, course (ref Course)
 - transactionType, status
 
-### Certificate
-- learner (ref User)
-- course (ref Course)
-- certificateId, issuedAt
+    certificateId, issuedAt
+
+## 🗄️ Database Schema
+
+```mermaid
+erDiagram
+    User ||--o{ Course : "creates (instructor)"
+    User ||--o{ Enrollment : "enrolls (learner)"
+    User ||--o{ Transaction : "sends/receives"
+    User ||--o{ Certificate : "earns"
+    
+    Course ||--o{ Enrollment : "has"
+    Course ||--o{ Transaction : "referenced in"
+    Course ||--o{ Certificate : "referenced in"
+
+    User {
+        ObjectId _id
+        String name
+        String email
+        String password
+        String role "learner/instructor/admin"
+        String bankAccountNumber
+        String secretNumber
+        Number balance
+    }
+
+    Course {
+        ObjectId _id
+        String title
+        String description
+        Number price
+        ObjectId instructor
+        String category
+        Number enrollmentCount
+    }
+
+    Enrollment {
+        ObjectId _id
+        ObjectId learner
+        ObjectId course
+        String completionStatus "enrolled/completed"
+        Boolean certificateIssued
+        Date enrolledAt
+    }
+
+    Transaction {
+        ObjectId _id
+        ObjectId from
+        ObjectId to
+        Number amount
+        ObjectId course
+        String transactionType
+        String status
+    }
+
+    Certificate {
+        ObjectId _id
+        ObjectId learner
+        ObjectId course
+        String certificateId
+        Date issuedAt
+    }
+```
 
 ## 🧪 Testing
 
@@ -291,8 +350,7 @@ ISC
 
 ## 👨‍💻 Author
 
-Built with ❤️ for LMS API Project Assignment
+Built with Ridoy Baidya ❤️ for LMS API Project Assignment
 
 ---
 
-**Good luck with your project presentation! 🚀**

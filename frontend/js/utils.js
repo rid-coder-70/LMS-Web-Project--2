@@ -115,7 +115,7 @@ function updateNavbar() {
         navbar.innerHTML = `
       <li><a href="courses.html" class="navbar-link">Courses</a></li>
       <li><a href="${dashboardLink}" class="navbar-link">Dashboard</a></li>
-      <li><button onclick="logout()" class="btn btn-outline">Logout</button></li>
+      <li><button onclick="logout()" class="btn btn-white-outline" style="padding: 0.45rem 1rem;">Logout</button></li>
     `;
     }
 }

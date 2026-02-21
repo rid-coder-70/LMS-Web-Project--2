@@ -21,7 +21,8 @@
       <ul class="navbar-menu">
         <li><a href="courses.html" class="navbar-link">Explore Courses</a></li>
         <li><a href="learner-dashboard.html" class="navbar-link">Dashboard</a></li>
-        <li><button onclick="logout()" class="btn btn-outline" style="padding: 0.5rem 1.25rem;">Logout</button></li>
+        <li><button onclick="logout()" class="btn btn-white-outline" style="padding: 0.5rem 1.25rem;">Logout</button>
+        </li>
       </ul>
     </div>
   </nav>
@@ -240,7 +241,7 @@
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(22);
       doc.setFont('helvetica', 'bold');
-      doc.text('🎓 LMS', W / 2, 28, { align: 'center' });
+      doc.text('[ LMS ]', W / 2, 28, { align: 'center' });
 
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
@@ -300,14 +301,40 @@
       doc.setFont('helvetica', 'bold');
       doc.text(certId, 35, 174);
 
-      // Center — Gold seal circle
+      // Center — 8-pointed star badge (no emoji, fully drawn)
+      const bx = W / 2, by = 173;
+      const outerR = 14, innerR = 6, points = 8;
+      // Build 8-pointed star polygon
+      const starPts = [];
+      for (let i = 0; i < points * 2; i++) {
+        const angle = (Math.PI / points) * i - Math.PI / 2;
+        const r = i % 2 === 0 ? outerR : innerR;
+        starPts.push([bx + r * Math.cos(angle), by + r * Math.sin(angle)]);
+      }
+      // Fill gold star
       doc.setFillColor(212, 175, 55);
-      doc.circle(W / 2, 173, 12, 'F');
+      doc.setDrawColor(212, 175, 55);
+      doc.setLineWidth(0.3);
+      const firstPt = starPts.shift();
+      doc.moveTo(firstPt[0], firstPt[1]);
+      starPts.forEach(p => doc.lineTo(p[0], p[1]));
+      // Draw filled star via lines
+      doc.setFillColor(212, 175, 55);
+      const allPts = [firstPt, ...starPts];
+      const lineSegs = allPts.slice(1).map((p, i) => [p[0] - allPts[i][0], p[1] - allPts[i][1]]);
+      doc.lines(lineSegs, firstPt[0], firstPt[1], [1, 1], 'FD', true);
+      // Inner dark circle
       doc.setFillColor(10, 10, 30);
-      doc.circle(W / 2, 173, 10, 'F');
+      doc.circle(bx, by, 5.5, 'F');
+      // Gold ring inside
+      doc.setDrawColor(212, 175, 55);
+      doc.setLineWidth(0.8);
+      doc.circle(bx, by, 4.5, 'S');
+      // "LMS" text in badge center
       doc.setTextColor(212, 175, 55);
-      doc.setFontSize(16);
-      doc.text('★', W / 2, 177, { align: 'center' });
+      doc.setFontSize(4.5);
+      doc.setFont('helvetica', 'bold');
+      doc.text('LMS', bx, by + 1.5, { align: 'center' });
 
       // Right — Issue date
       doc.setTextColor(150, 150, 190);

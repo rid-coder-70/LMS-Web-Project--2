@@ -19,7 +19,8 @@
       <ul class="navbar-menu">
         <li><a href="courses.html" class="navbar-link">Explore Courses</a></li>
         <li><a href="instructor-dashboard.html" class="navbar-link">Dashboard</a></li>
-        <li><button onclick="logout()" class="btn btn-outline" style="padding: 0.5rem 1.25rem;">Logout</button></li>
+        <li><button onclick="logout()" class="btn btn-white-outline" style="padding: 0.5rem 1.25rem;">Logout</button>
+        </li>
       </ul>
     </div>
   </nav>
@@ -109,15 +110,15 @@
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-sm);">
               <span class="badge badge-primary">${course.category || 'General'}</span>
               <div style="display: flex; gap: var(--spacing-xs);">
-                <button onclick="editCourse('${course._id}')" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">✏️</button>
-                <button onclick="deleteCourse('${course._id}')" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem; background: var(--danger);">🗑️</button>
+                <button onclick="editCourse('${course._id}')" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">✏️</button>
+                <button onclick="deleteCourse('${course._id}')" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">🗑️</button>
               </div>
             </div>
             <h4>${course.title}</h4>
             <p style="font-size: 0.875rem;">${(course.description || '').substring(0, 100)}...</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid var(--border-primary);">
               <div>
-                <div style="font-weight: 700; color: var(--primary-light);">${formatCurrency(course.price)}</div>
+                <div style="font-weight: 700; color: var(--primary);">${formatCurrency(course.price)}</div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">👥 ${course.enrollmentCount || 0} students</div>
               </div>
               <div style="text-align: right;">

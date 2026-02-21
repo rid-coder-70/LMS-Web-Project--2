@@ -17,7 +17,8 @@ function showToast(message, type = 'info') {
 
 // Format currency
 function formatCurrency(amount) {
-    return `$${amount.toFixed(2)}`;
+    if (amount === null || amount === undefined || isNaN(amount)) return '$0.00';
+    return `$${Number(amount).toFixed(2)}`;
 }
 
 // Format date

@@ -38,13 +38,6 @@ const createCourse = async (req, res) => {
     try {
         const { title, description, price, materials, category, duration } = req.body;
 
-        // Instructor payment from LMS organization (simulated)
-        const lmsOrg = await User.findOne({ role: 'admin' });
-
-        if (!lmsOrg) {
-            return res.status(400).json({ message: 'LMS organization not found' });
-        }
-
         const course = await Course.create({
             title,
             description,
@@ -55,28 +48,40 @@ const createCourse = async (req, res) => {
             duration: duration || '4 weeks',
         });
 
-        // Create transaction: LMS pays instructor for uploading course
-        const instructorPayment = 500; // Fixed payment for uploading course
+        // Instructor payment from LMS organization (simulated) — optional if admin exists
+        const lmsOrg = await User.findOne({ role: 'admin' });
+        const instructorPayment = 500;
 
-        const transaction = await Transaction.create({
-            from: lmsOrg._id,
-            to: req.user._id,
-            amount: instructorPayment,
-            course: course._id,
-            transactionType: 'instructor_payment',
-            description: `Payment for uploading course: ${course.title}`,
-        });
+        if (lmsOrg) {
+            await Transaction.create({
+                from: lmsOrg._id,
+                to: req.user._id,
+                amount: instructorPayment,
+                course: course._id,
+                transactionType: 'instructor_payment',
+                description: `Payment for uploading course: ${course.title}`,
+            });
 
-        // Update instructor balance
-        const instructor = await User.findById(req.user._id);
-        instructor.balance += instructorPayment;
-        await instructor.save();
+            // Update instructor balance
+            const instructor = await User.findById(req.user._id);
+            instructor.balance += instructorPayment;
+            await instructor.save();
 
+            return res.status(201).json({
+                course,
+                payment: {
+                    amount: instructorPayment,
+                    message: 'Course created! You received payment for uploading.',
+                },
+            });
+        }
+
+        // No admin / payment system — still return success
         res.status(201).json({
             course,
             payment: {
-                amount: instructorPayment,
-                message: 'Course created! You received payment for uploading.',
+                amount: 0,
+                message: 'Course created successfully!',
             },
         });
     } catch (error) {

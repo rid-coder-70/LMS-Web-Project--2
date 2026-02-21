@@ -7,6 +7,8 @@
     <title>Learner Dashboard - LMS</title>
     <link rel="stylesheet" href="css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- jsPDF for certificate PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -135,17 +137,24 @@
                 certificatesList.innerHTML = '<p>No certificates yet. Complete a course to earn one!</p>';
             } else {
                 certificatesList.innerHTML = certificates.map(cert => `
-          <div class="card-glass" style="padding: var(--spacing-md); margin-bottom: var(--spacing-sm); display: flex; justify-content: space-between; align-items: center;">
+          <div class="card-glass" style="padding: var(--spacing-md); margin-bottom: var(--spacing-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-sm);">
             <div>
               <h4>🏆 ${cert.course.title}</h4>
               <p style="font-size: 0.875rem; color: var(--text-muted);">
-                Certificate ID: ${cert.certificateId}
+                Certificate ID: <strong>${cert.certificateId}</strong>
               </p>
               <p style="font-size: 0.875rem; color: var(--text-muted);">
                 Issued: ${formatDate(cert.issuedAt)}
               </p>
             </div>
-            <span class="badge badge-success">Certified</span>
+            <div style="display: flex; gap: var(--spacing-sm); align-items: center; flex-wrap: wrap;">
+              <span class="badge badge-success">Certified ✓</span>
+              <button
+                onclick="downloadCertificate('${cert.certificateId}', '${cert.course.title}', '${formatDate(cert.issuedAt)}', '${cert.learner ? cert.learner.name : user.name}')"
+                class="btn btn-primary"
+                style="font-size: 0.875rem; padding: 0.4rem 1rem;"
+              >📥 Download PDF</button>
+            </div>
           </div>
         `).join('');
             }
@@ -190,6 +199,134 @@
                 showToast('An error occurred', 'error');
                 console.error(error);
             }
+        }
+
+        function downloadCertificate(certId, courseTitle, issuedDate, learnerName) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4',
+            });
+
+            const W = doc.internal.pageSize.getWidth();
+            const H = doc.internal.pageSize.getHeight();
+
+            // ── Background ──────────────────────────────────────────────
+            doc.setFillColor(10, 10, 30);
+            doc.rect(0, 0, W, H, 'F');
+
+            // ── Outer gold border ────────────────────────────────────────
+            doc.setDrawColor(212, 175, 55);
+            doc.setLineWidth(3);
+            doc.rect(8, 8, W - 16, H - 16);
+
+            // ── Inner gold border ────────────────────────────────────────
+            doc.setLineWidth(0.8);
+            doc.rect(12, 12, W - 24, H - 24);
+
+            // ── Purple gradient header band ──────────────────────────────
+            doc.setFillColor(88, 28, 135);
+            doc.rect(12, 12, W - 24, 38, 'F');
+
+            // Header accent line
+            doc.setDrawColor(212, 175, 55);
+            doc.setLineWidth(1);
+            doc.line(12, 50, W - 12, 50);
+
+            // ── LMS brand in header ──────────────────────────────────────
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text('🎓 LMS', W / 2, 28, { align: 'center' });
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(212, 175, 55);
+            doc.text('LEARNING MANAGEMENT SYSTEM', W / 2, 38, { align: 'center' });
+
+            // ── "CERTIFICATE OF COMPLETION" title ────────────────────────
+            doc.setTextColor(212, 175, 55);
+            doc.setFontSize(28);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CERTIFICATE OF COMPLETION', W / 2, 72, { align: 'center' });
+
+            // ── Decorative line under title ──────────────────────────────
+            doc.setDrawColor(212, 175, 55);
+            doc.setLineWidth(0.5);
+            const lineW = 120;
+            doc.line(W / 2 - lineW / 2, 76, W / 2 + lineW / 2, 76);
+
+            // ── "This is to certify that" ────────────────────────────────
+            doc.setTextColor(180, 180, 220);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'italic');
+            doc.text('This is to proudly certify that', W / 2, 92, { align: 'center' });
+
+            // ── Learner name ─────────────────────────────────────────────
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(34);
+            doc.setFont('helvetica', 'bold');
+            doc.text(learnerName, W / 2, 110, { align: 'center' });
+
+            // Underline
+            const nameWidth = doc.getTextWidth(learnerName);
+            doc.setDrawColor(212, 175, 55);
+            doc.setLineWidth(0.6);
+            doc.line(W / 2 - nameWidth / 2, 113, W / 2 + nameWidth / 2, 113);
+
+            // ── "has successfully completed" ─────────────────────────────
+            doc.setTextColor(180, 180, 220);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'italic');
+            doc.text('has successfully completed the course', W / 2, 126, { align: 'center' });
+
+            // ── Course title ─────────────────────────────────────────────
+            doc.setTextColor(212, 175, 55);
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text(courseTitle, W / 2, 142, { align: 'center' });
+
+            // ── Footer row: cert ID | trophy | date ──────────────────────
+            // Left — Certificate ID
+            doc.setTextColor(150, 150, 190);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Certificate ID', 35, 168);
+            doc.setTextColor(212, 175, 55);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text(certId, 35, 174);
+
+            // Center — Gold seal circle
+            doc.setFillColor(212, 175, 55);
+            doc.circle(W / 2, 173, 12, 'F');
+            doc.setFillColor(10, 10, 30);
+            doc.circle(W / 2, 173, 10, 'F');
+            doc.setTextColor(212, 175, 55);
+            doc.setFontSize(16);
+            doc.text('★', W / 2, 177, { align: 'center' });
+
+            // Right — Issue date
+            doc.setTextColor(150, 150, 190);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Date of Issue', W - 35, 168, { align: 'right' });
+            doc.setTextColor(212, 175, 55);
+            doc.setFont('helvetica', 'bold');
+            doc.text(issuedDate, W - 35, 174, { align: 'right' });
+
+            // ── Bottom tagline ────────────────────────────────────────────
+            doc.setTextColor(80, 80, 120);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'italic');
+            doc.text('Issued by LMS | Learning Management System', W / 2, H - 16, { align: 'center' });
+
+            // ── Save ──────────────────────────────────────────────────────
+            const safeName = courseTitle.replace(/[^a-z0-9]/gi, '_');
+            doc.save(`Certificate_${safeName}_${certId}.pdf`);
+
+            showToast('📥 Certificate PDF downloaded!', 'success');
         }
 
         loadDashboard();

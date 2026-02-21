@@ -2,214 +2,254 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instructor Dashboard - LMS</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructor Dashboard - LMS</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="index.html" class="navbar-brand">🎓 LMS</a>
-            <ul class="navbar-menu">
-                <li><a href="courses.html" class="navbar-link">All Courses</a></li>
-                <li><a href="instructor-dashboard.html" class="navbar-link">Dashboard</a></li>
-                <li><button onclick="logout()" class="btn btn-outline">Logout</button></li>
-            </ul>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">🎓 LMS</a>
+      <ul class="navbar-menu">
+        <li><a href="courses.html" class="navbar-link">All Courses</a></li>
+        <li><a href="instructor-dashboard.html" class="navbar-link">Dashboard</a></li>
+        <li><button onclick="logout()" class="btn btn-outline">Logout</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Dashboard -->
+  <section class="py-5">
+    <div class="container">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+        <div>
+          <h1 id="welcomeText">Instructor Dashboard</h1>
+          <p id="balanceText" style="font-size: 1.125rem; color: var(--text-muted);"></p>
         </div>
-    </nav>
+        <button onclick="showCreateCourseModal()" class="btn btn-primary">+ Create New Course</button>
+      </div>
 
-    <!-- Dashboard -->
-    <section class="py-5">
-        <div class="container">
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
-                <div>
-                    <h1 id="welcomeText">Instructor Dashboard</h1>
-                    <p id="balanceText" style="font-size: 1.125rem; color: var(--text-muted);"></p>
-                </div>
-                <button onclick="showCreateCourseModal()" class="btn btn-primary">+ Create New Course</button>
-            </div>
-
-            <!-- Stats -->
-            <div class="grid grid-3 mb-3">
-                <div class="card card-glass text-center">
-                    <h3 id="coursesCount" class="text-gradient">0</h3>
-                    <p>My Courses</p>
-                </div>
-                <div class="card card-glass text-center">
-                    <h3 id="totalEnrollments" class="text-gradient">0</h3>
-                    <p>Total Enrollments</p>
-                </div>
-                <div class="card card-glass text-center">
-                    <h3 id="totalEarnings" class="text-gradient">$0</h3>
-                    <p>Total Earnings</p>
-                </div>
-            </div>
-
-            <!-- My Courses -->
-            <div class="card">
-                <h2 class="mb-2">My Courses</h2>
-                <div id="coursesList" class="grid grid-2">
-                    <!-- Courses will be loaded here -->
-                </div>
-            </div>
+      <!-- Stats -->
+      <div class="grid grid-3 mb-3">
+        <div class="card card-glass text-center">
+          <h3 id="coursesCount" class="text-gradient">0</h3>
+          <p>My Courses</p>
         </div>
-    </section>
+        <div class="card card-glass text-center">
+          <h3 id="totalEnrollments" class="text-gradient">0</h3>
+          <p>Total Enrollments</p>
+        </div>
+        <div class="card card-glass text-center">
+          <h3 id="totalEarnings" class="text-gradient">$0</h3>
+          <p>Total Earnings</p>
+        </div>
+      </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/utils.js"></script>
-    <script>
-        protectPage();
+      <!-- My Courses -->
+      <div class="card">
+        <h2 class="mb-2">My Courses</h2>
+        <div id="coursesList" class="grid grid-2">
+          <!-- Courses will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </section>
 
-        const user = getUser();
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    protectPage();
 
-        if (!user || user.role !== 'instructor') {
-            window.location.href = 'index.html';
+    const user = getUser();
+
+    if (!user || user.role !== 'instructor') {
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('welcomeText').textContent = `Welcome, ${user.name}!`;
+
+    async function loadDashboard() {
+      const coursesList = document.getElementById('coursesList');
+      coursesList.innerHTML = '<div class="spinner" style="margin: 2rem auto;"></div>';
+
+      try {
+        // Load user info
+        const userInfo = await api.auth.getMe();
+        document.getElementById('balanceText').textContent = `Earnings: ${formatCurrency(userInfo.balance)}`;
+
+        // Load instructor's courses
+        const courses = await api.courses.getInstructorCourses();
+
+        // Guard: courses must be an array
+        if (!Array.isArray(courses)) {
+          coursesList.innerHTML = `<p style="color:var(--danger);">Failed to load courses: ${courses.message || 'Unknown error'}</p>`;
+          return;
         }
 
-        document.getElementById('welcomeText').textContent = `Welcome, ${user.name}!`;
+        document.getElementById('coursesCount').textContent = courses.length;
 
-        async function loadDashboard() {
-            // Load user info
-            const userInfo = await api.auth.getMe();
-            document.getElementById('balanceText').textContent = `Earnings: ${formatCurrency(userInfo.balance)}`;
+        const totalEnrollments = courses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0);
+        document.getElementById('totalEnrollments').textContent = totalEnrollments;
 
-            // Load instructor's courses
-            const courses = await api.courses.getInstructorCourses();
-            document.getElementById('coursesCount').textContent = courses.length;
+        const totalEarnings = courses.reduce((sum, c) => sum + ((c.price || 0) * (c.enrollmentCount || 0)), 0);
+        document.getElementById('totalEarnings').textContent = formatCurrency(totalEarnings);
 
-            const totalEnrollments = courses.reduce((sum, course) => sum + course.enrollmentCount, 0);
-            document.getElementById('totalEnrollments').textContent = totalEnrollments;
-
-            const totalEarnings = courses.reduce((sum, course) => sum + (course.price * course.enrollmentCount), 0);
-            document.getElementById('totalEarnings').textContent = formatCurrency(totalEarnings);
-
-            const coursesList = document.getElementById('coursesList');
-            if (courses.length === 0) {
-                coursesList.innerHTML = '<p>No courses created yet. Click "Create New Course" to get started!</p>';
-            } else {
-                coursesList.innerHTML = courses.map(course => `
+        if (courses.length === 0) {
+          coursesList.innerHTML = '<p>No courses created yet. Click "Create New Course" to get started!</p>';
+        } else {
+          coursesList.innerHTML = courses.map(course => `
           <div class="card-glass" style="padding: var(--spacing-md);">
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-sm);">
-              <span class="badge badge-primary">${course.category}</span>
+              <span class="badge badge-primary">${course.category || 'General'}</span>
               <div style="display: flex; gap: var(--spacing-xs);">
                 <button onclick="editCourse('${course._id}')" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">✏️</button>
                 <button onclick="deleteCourse('${course._id}')" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem; background: var(--danger);">🗑️</button>
               </div>
             </div>
             <h4>${course.title}</h4>
-            <p style="font-size: 0.875rem;">${course.description.substring(0, 100)}...</p>
+            <p style="font-size: 0.875rem;">${(course.description || '').substring(0, 100)}...</p>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid rgba(255,255,255,0.1);">
               <div>
                 <div style="font-weight: 700; color: var(--primary-light);">${formatCurrency(course.price)}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">👥 ${course.enrollmentCount} students</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">👥 ${course.enrollmentCount || 0} students</div>
               </div>
               <div style="text-align: right;">
-                <div style="font-weight: 700; color: var(--success);">${formatCurrency(course.price * course.enrollmentCount)}</div>
+                <div style="font-weight: 700; color: var(--success);">${formatCurrency((course.price || 0) * (course.enrollmentCount || 0))}</div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">Total earned</div>
               </div>
             </div>
           </div>
         `).join('');
-            }
         }
+      } catch (error) {
+        coursesList.innerHTML = `<p style="color:var(--danger);">An error occurred loading dashboard.</p>`;
+        console.error(error);
+      }
+    }
 
-        function showCreateCourseModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal active';
-            modal.innerHTML = `
+    function showCreateCourseModal(existingCourse = null) {
+      const isEdit = !!existingCourse;
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `
         <div class="modal-content" style="max-width: 600px;">
-          <h3 class="mb-2">Create New Course</h3>
+          <h3 class="mb-2">${isEdit ? 'Edit Course' : 'Create New Course'}</h3>
           
           <form id="createCourseForm">
             <div class="form-group">
               <label class="form-label">Course Title</label>
-              <input type="text" class="form-control" id="courseTitle" required>
+              <input type="text" class="form-control" id="courseTitle" value="${isEdit ? existingCourse.title : ''}" required>
             </div>
 
             <div class="form-group">
               <label class="form-label">Description</label>
-              <textarea class="form-control" id="courseDescription" rows="4" required></textarea>
+              <textarea class="form-control" id="courseDescription" rows="4" required>${isEdit ? existingCourse.description : ''}</textarea>
             </div>
 
             <div class="form-group">
               <label class="form-label">Category</label>
-              <input type="text" class="form-control" id="courseCategory" placeholder="e.g., Web Development">
+              <input type="text" class="form-control" id="courseCategory" placeholder="e.g., Web Development" value="${isEdit ? (existingCourse.category || '') : ''}">
             </div>
 
             <div class="form-group">
               <label class="form-label">Price ($)</label>
-              <input type="number" class="form-control" id="coursePrice" min="0" step="0.01" required>
+              <input type="number" class="form-control" id="coursePrice" min="0" step="0.01" value="${isEdit ? existingCourse.price : ''}" required>
             </div>
 
             <div class="form-group">
               <label class="form-label">Duration</label>
-              <input type="text" class="form-control" id="courseDuration" placeholder="e.g., 6 weeks">
+              <input type="text" class="form-control" id="courseDuration" placeholder="e.g., 6 weeks" value="${isEdit ? (existingCourse.duration || '') : ''}">
             </div>
 
             <div class="form-group">
               <label class="form-label">Course Materials</label>
-              <textarea class="form-control" id="courseMaterials" rows="3"></textarea>
+              <textarea class="form-control" id="courseMaterials" rows="3">${isEdit ? (existingCourse.materials || '') : ''}</textarea>
             </div>
 
             <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
               <button type="button" class="btn btn-outline" style="flex: 1;" onclick="this.closest('.modal').remove()">Cancel</button>
-              <button type="submit" class="btn btn-primary" style="flex: 1;">Create Course</button>
+              <button type="submit" class="btn btn-primary" style="flex: 1;">${isEdit ? 'Save Changes' : 'Create Course'}</button>
             </div>
           </form>
         </div>
       `;
 
-            document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-            document.getElementById('createCourseForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
+      document.getElementById('createCourseForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-                const data = {
-                    title: document.getElementById('courseTitle').value,
-                    description: document.getElementById('courseDescription').value,
-                    price: parseFloat(document.getElementById('coursePrice').value),
-                    category: document.getElementById('courseCategory').value || 'General',
-                    duration: document.getElementById('courseDuration').value || '4 weeks',
-                    materials: document.getElementById('courseMaterials').value || 'Course materials will be provided.',
-                };
+        const data = {
+          title: document.getElementById('courseTitle').value,
+          description: document.getElementById('courseDescription').value,
+          price: parseFloat(document.getElementById('coursePrice').value),
+          category: document.getElementById('courseCategory').value || 'General',
+          duration: document.getElementById('courseDuration').value || '4 weeks',
+          materials: document.getElementById('courseMaterials').value || 'Course materials will be provided.',
+        };
 
-                try {
-                    const result = await api.courses.create(data);
-
-                    if (result.course) {
-                        modal.remove();
-                        showToast(`Course created! You received ${formatCurrency(result.payment.amount)} payment!`, 'success');
-                        loadDashboard();
-                    } else {
-                        showToast(result.message || 'Failed to create course', 'error');
-                    }
-                } catch (error) {
-                    showToast('An error occurred', 'error');
-                    console.error(error);
-                }
-            });
-        }
-
-        async function deleteCourse(courseId) {
-            if (!confirm('Are you sure you want to delete this course?')) return;
-
-            try {
-                await api.courses.delete(courseId);
-                showToast('Course deleted successfully', 'success');
-                loadDashboard();
-            } catch (error) {
-                showToast('Failed to delete course', 'error');
-                console.error(error);
+        try {
+          let result;
+          if (isEdit) {
+            result = await api.courses.update(existingCourse._id, data);
+            if (result._id || result.title) {
+              modal.remove();
+              showToast('Course updated successfully!', 'success');
+              loadDashboard();
+            } else {
+              showToast(result.message || 'Failed to update course', 'error');
             }
+          } else {
+            result = await api.courses.create(data);
+            if (result.course) {
+              modal.remove();
+              showToast(`Course created! ${result.payment.message}`, 'success');
+              loadDashboard();
+            } else {
+              showToast(result.message || 'Failed to create course', 'error');
+            }
+          }
+        } catch (error) {
+          showToast('An error occurred', 'error');
+          console.error(error);
         }
+      });
+    }
 
+    async function editCourse(courseId) {
+      try {
+        const course = await api.courses.getOne(courseId);
+        if (!course || !course._id) {
+          showToast('Could not load course data', 'error');
+          return;
+        }
+        showCreateCourseModal(course);
+      } catch (error) {
+        showToast('Failed to load course for editing', 'error');
+        console.error(error);
+      }
+    }
+
+    async function deleteCourse(courseId) {
+      if (!confirm('Are you sure you want to delete this course?')) return;
+
+      try {
+        await api.courses.delete(courseId);
+        showToast('Course deleted successfully', 'success');
         loadDashboard();
-    </script>
+      } catch (error) {
+        showToast('Failed to delete course', 'error');
+        console.error(error);
+      }
+    }
+
+    loadDashboard();
+  </script>
 </body>
 
 </html>

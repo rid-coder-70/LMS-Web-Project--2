@@ -52,8 +52,8 @@
                         </select>
                     </div>
 
-                    <!-- Bank Information (for learners) -->
-                    <div id="bankInfoSection">
+                    <!-- Bank Information (for learners only) -->
+                    <div id="bankInfoSection" style="display: block;">
                         <h4 class="mt-2 mb-1" style="font-size: 1.125rem;">Bank Information</h4>
                         <p style="font-size: 0.875rem; color: var(--text-muted);">Required for course payments</p>
 
@@ -99,6 +99,11 @@
                 bankInfoSection.style.display = 'block';
             }
         });
+
+        // Set initial state on page load
+        if (roleSelect.value === 'instructor') {
+            bankInfoSection.style.display = 'none';
+        }
 
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();

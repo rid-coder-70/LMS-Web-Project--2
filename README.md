@@ -1,64 +1,76 @@
 # 🎓 LMS - Learning Management System
 
-A full-stack Learning Management System (LMS) with course enrollment, secure payments, and certificate generation.
+A full-stack Learning Management System with course management, secure payments, certificate generation, and **PDF certificate downloads**.
+
+[![Node.js](https://img.shields.io/badge/Node.js-v14+-green)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-required-brightgreen)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-ISC-blue)](LICENSE)
+
+---
 
 ## 📋 Features
 
-### For Learners
-- 🔐 User registration and authentication
-- 📚 Browse and view courses
-- 💳 Enroll in courses with secure bank payment
-- 🏆 Earn certificates upon course completion
-- 📊 Personal dashboard with enrolled courses and certificates
-- 💰 Transaction history tracking
+| Role | Features |
+|------|----------|
+| **Learner** | Register, browse courses, enroll with bank payment, earn & **download PDF certificates** |
+| **Instructor** | Create/edit/delete courses, track enrollments, view earnings |
+| **Admin/LMS Org** | Facilitates payments between learners and instructors |
 
-### For Instructors
-- 📝 Create and manage courses
-- 💸 Receive payments for course uploads
-- 📈 Track student enrollments
-- 💵 View earnings and statistics
-
-### For LMS Organization
-- 🏢 Manages platform and payments
-- 🔄 Facilitates transactions between learners and instructors
+---
 
 ## 🛠️ Technology Stack
 
 ### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - Database
-- **Mongoose** - ODM
-- **JWT** - Authentication
-- **bcryptjs** - Password hashing
+- **Node.js** + **Express.js** — REST API server
+- **MongoDB** + **Mongoose** — Database & ODM
+- **JWT** — Authentication
+- **bcryptjs** — Password hashing
 
 ### Frontend
-- **HTML5** - Structure
-- **CSS3** - Modern styling with glassmorphism
-- **JavaScript** - Interactivity
-- **Google Fonts (Inter)** - Typography
+- **HTML5 + CSS3 + JavaScript** — Vanilla, no framework needed
+- **jsPDF** (CDN) — PDF certificate generation
+- **Google Fonts (Inter)** — Typography
+
+---
 
 ## 📁 Project Structure
 
 ```
-lms-project/
+LMS-Web-Project--2/
 ├── backend/
-│   ├── config/          # Database and JWT config
-│   ├── controllers/     # Route handlers
-│   ├── middleware/      # Auth and error handling
-│   ├── models/          # Database models
-│   ├── routes/          # API routes
-│   ├── utils/           # Bank simulator and seed data
-│   ├── server.js        # Entry point
+│   ├── config/
+│   │   ├── db.js              # MongoDB connection
+│   │   └── jwt.js             # JWT helpers
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── courseController.js
+│   │   ├── enrollmentController.js
+│   │   ├── certificateController.js
+│   │   └── transactionController.js
+│   ├── middleware/
+│   │   ├── auth.js            # JWT protect & role guard
+│   │   └── errorHandler.js
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Course.js
+│   │   ├── Enrollment.js
+│   │   ├── Transaction.js
+│   │   └── Certificate.js
+│   ├── routes/                # API route files
+│   ├── utils/
+│   │   ├── bankSimulator.js
+│   │   └── seedData.js
+│   ├── server.js              # App entry point
+│   ├── .env                   # Environment variables (not committed)
 │   └── package.json
 │
 ├── frontend/
 │   ├── css/
-│   │   └── main.css    # Main stylesheet
+│   │   └── main.css
 │   ├── js/
-│   │   ├── api.js      # API service layer
-│   │   └── utils.js    # Utility functions
-│   ├── index.html      # Landing page
+│   │   ├── api.js             # All API calls in one place
+│   │   └── utils.js           # Shared helper functions
+│   ├── index.html             # Landing page
 │   ├── login.html
 │   ├── register.html
 │   ├── courses.html
@@ -66,190 +78,186 @@ lms-project/
 │   ├── learner-dashboard.html
 │   └── instructor-dashboard.html
 │
+├── start_project.sh           # One-command startup script
 └── README.md
 ```
 
-## 🚀 Getting Started
+---
+
+## 🚀 How to Run
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB (local or Atlas)
-- npm or yarn
 
-### Installation
+Make sure you have these installed:
+- [Node.js v14+](https://nodejs.org/)
+- [MongoDB](https://www.mongodb.com/try/download/community) (local) or a MongoDB Atlas URI
+- [npm](https://www.npmjs.com/) (comes with Node.js)
+- Python 3 (for the frontend server — comes pre-installed on Linux/Mac)
 
-1. **Clone the repository**
+---
+
+### Step 1 — Clone the Repository
+
 ```bash
-cd "Web 1"
+git clone https://github.com/rid-coder-70/LMS-Web-Project--2.git
+cd LMS-Web-Project--2
 ```
 
-2. **Setup Backend**
+---
+
+### Step 2 — Configure Backend Environment
+
 ```bash
 cd backend
-npm install
 cp .env.example .env
 ```
 
-3. **Configure Environment**
+Open `backend/.env` and fill in:
 
-Edit `backend/.env`:
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/lms-db
-JWT_SECRET=your_super_secret_jwt_key
+JWT_SECRET=your_super_secret_jwt_key_here
 NODE_ENV=development
 ```
 
-4. **Start MongoDB**
+> 💡 **MongoDB Atlas?** Replace `MONGODB_URI` with your Atlas connection string.
+
+---
+
+### Step 3 — Install Backend Dependencies
+
 ```bash
-# If using local MongoDB
-mongod
+# Inside /backend
+npm install
 ```
 
-5. **Seed Database**
-```bash
-npm run seed
-```
+---
 
-6. **Start Backend Server**
+### Step 4 — Start the Backend Server
+
 ```bash
+# Inside /backend
 npm run dev
 ```
 
-Backend will run on `http://localhost:5000`
+✅ Backend runs at → **http://localhost:5000**
 
-7. **Open Frontend**
+You'll see:
+```
+🚀 Server running on port 5000
+📡 API URL: http://localhost:5000
+```
 
-Open `frontend/index.html` in a browser or use a live server:
-- VS Code: Install "Live Server" extension and right-click on `index.html` → "Open with Live Server"
-- Or use Python: `cd frontend && python3 -m http.server 8000`
+---
 
-Frontend will be available at `http://localhost:8000` (or your live server URL)
+### Step 5 — Start the Frontend Server
 
-## 👥 Test Accounts
+Open a **new terminal** and run:
 
-### Learner Account
-- **Email**: learner@test.com
-- **Password**: learner123
-- **Bank Account**: ACC999
-- **Secret Number**: SECRET999
-- **Initial Balance**: $15,000
+```bash
+cd frontend
+python3 -m http.server 8000
+```
 
-### Instructor Accounts
-- **Email**: john@instructor.com
-- **Password**: instructor123
+✅ Frontend runs at → **http://localhost:8000**
 
-- **Email**: sarah@instructor.com
-- **Password**: instructor123
+> **Windows users:** Use `python -m http.server 8000` or install VS Code's [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension.
 
-- **Email**: michael@instructor.com
-- **Password**: instructor123
+---
 
-### Admin/LMS Organization
-- **Email**: admin@lms.com
-- **Password**: admin123
+### Quick Start (Both servers together)
+
+```bash
+# Run from the project root
+bash start_project.sh
+```
+
+---
+
+### Verify It's Working
+
+| Check | URL |
+|-------|-----|
+| Backend API | http://localhost:5000 |
+| Frontend Home | http://localhost:8000/index.html |
+| All Courses | http://localhost:8000/courses.html |
+
+---
 
 ## 🔌 API Endpoints
 
-### Authentication
+### Auth
 ```
-POST   /api/auth/register      # Register new user
-POST   /api/auth/login         # Login user
-PUT    /api/auth/setup-bank    # Setup bank information
-GET    /api/auth/me           # Get current user
+POST  /api/auth/register       Register new user (learner or instructor)
+POST  /api/auth/login          Login
+PUT   /api/auth/setup-bank     Add bank account info
+GET   /api/auth/me             Get current logged-in user
 ```
 
 ### Courses
 ```
-GET    /api/courses                    # Get all courses
-GET    /api/courses/:id                # Get single course
-POST   /api/courses                    # Create course (instructor)
-PUT    /api/courses/:id                # Update course (instructor)
-DELETE /api/courses/:id                # Delete course (instructor)
-GET    /api/courses/my/instructor      # Get instructor's courses
+GET    /api/courses                  List all courses (public)
+GET    /api/courses/:id              Get one course (public)
+POST   /api/courses                  Create course (instructor only)
+PUT    /api/courses/:id              Edit course (instructor only)
+DELETE /api/courses/:id              Delete course (instructor only)
+GET    /api/courses/my/instructor    My courses (instructor only)
 ```
 
 ### Enrollments
 ```
-POST   /api/enrollments                # Enroll in course (learner)
-GET    /api/enrollments/my             # Get learner's enrollments
-PUT    /api/enrollments/:id/complete   # Mark course as completed
+POST  /api/enrollments              Enroll in a course (learner)
+GET   /api/enrollments/my           Get my enrollments (learner)
+PUT   /api/enrollments/:id/complete Mark course complete (learner)
 ```
 
 ### Transactions
 ```
-GET    /api/transactions/my            # Get user's transactions
-GET    /api/transactions/:id           # Get transaction details
+GET  /api/transactions/my    My transaction history
+GET  /api/transactions/:id   Get one transaction
 ```
 
 ### Certificates
 ```
-GET    /api/certificates/my            # Get learner's certificates
-GET    /api/certificates/:id           # Get certificate by ID
+GET  /api/certificates/my    My certificates (learner)
+GET  /api/certificates/:id   Get one certificate
 ```
+
+---
+
+## 👥 Test Accounts (after seeding)
+
+Run `npm run seed` inside `/backend` to populate the database.
+
+| Role | Email | Password |
+|------|-------|----------|
+| Learner | learner@test.com | learner123 |
+| Instructor | john@instructor.com | instructor123 |
+| Admin | admin@lms.com | admin123 |
+
+> Or just **register a new account** — it works without seeding.
+
+---
 
 ## 💡 Usage Guide
 
 ### As a Learner
-
-1. **Register**: Go to sign up page and create account with bank details
-2. **Browse Courses**: View available courses on the courses page
-3. **Enroll**: Click on a course and enroll with your secret number
-4. **Complete**: Mark courses as completed to earn certificates
-5. **View Certificates**: Check your certificates in the dashboard
+1. Register at `/register.html` — choose **Learner**, fill in bank details
+2. Browse courses at `/courses.html`
+3. Click a course → **Enroll Now** → enter your PIN → enrolled!
+4. Go to dashboard → click **Mark as Complete**
+5. 🏆 Certificate appears — click **📥 Download PDF** to get your certificate!
 
 ### As an Instructor
+1. Register at `/register.html` — choose **Instructor**
+2. Dashboard → **+ Create New Course** → fill in details
+3. Click ✏️ to edit or 🗑️ to delete any course
+4. Track student enrollments and earnings in the stats cards
 
-1. **Register**: Sign up as an instructor
-2. **Create Course**: Use the "Create New Course" button in dashboard
-3. **Get Paid**: Receive $500 payment automatically when uploading a course
-4. **Track Earnings**: View enrollments and total earnings in dashboard
+---
 
-## 🔒 Security Features
-
-- Password hashing with bcrypt
-- JWT-based authentication
-- Protected routes with middleware
-- Bank secret number validation
-- Role-based access control
-
-## 🎨 Design Features
-
-- Modern dark theme
-- Glassmorphism effects
-- Smooth animations and transitions
-- Responsive design
-- Beautiful gradient buttons
-- Toast notifications
-- Modal dialogs
-
-## 📊 Database Models
-
-### User
-- name, email, password (hashed)
-- role (learner/instructor/admin)
-- bankAccountNumber, secretNumber
-- balance
-
-### Course
-- title, description, price
-- instructor (ref User)
-- category, duration, materials
-- enrollmentCount
-
-### Enrollment
-- learner (ref User)
-- course (ref Course)
-- completionStatus, certificateIssued
-
-### Transaction
-- from (ref User), to (ref User)
-- amount, course (ref Course)
-- transactionType, status
-
-    certificateId, issuedAt
-
-## 🗄️ Database Schema
+## 📊 Database Schema
 
 ```mermaid
 erDiagram
@@ -257,9 +265,7 @@ erDiagram
     User ||--o{ Enrollment : "enrolls (learner)"
     User ||--o{ Transaction : "sends/receives"
     User ||--o{ Certificate : "earns"
-    
     Course ||--o{ Enrollment : "has"
-    Course ||--o{ Transaction : "referenced in"
     Course ||--o{ Certificate : "referenced in"
 
     User {
@@ -267,12 +273,11 @@ erDiagram
         String name
         String email
         String password
-        String role "learner/instructor/admin"
+        String role "learner / instructor / admin"
         String bankAccountNumber
         String secretNumber
         Number balance
     }
-
     Course {
         ObjectId _id
         String title
@@ -280,18 +285,17 @@ erDiagram
         Number price
         ObjectId instructor
         String category
+        String duration
         Number enrollmentCount
     }
-
     Enrollment {
         ObjectId _id
         ObjectId learner
         ObjectId course
-        String completionStatus "enrolled/completed"
+        String completionStatus
         Boolean certificateIssued
         Date enrolledAt
     }
-
     Transaction {
         ObjectId _id
         ObjectId from
@@ -301,7 +305,6 @@ erDiagram
         String transactionType
         String status
     }
-
     Certificate {
         ObjectId _id
         ObjectId learner
@@ -311,38 +314,45 @@ erDiagram
     }
 ```
 
-## 🧪 Testing
+---
 
-### Backend Testing
-```bash
-cd backend
-npm test
-```
+## 🔒 Security
 
-### Manual Testing
-1. Register as learner and instructor
-2. Create courses as instructor
-3. Enroll in courses as learner
-4. Complete course and verify certificate
-5. Check transaction history
+- Passwords hashed with **bcrypt**
+- Routes protected by **JWT middleware**
+- Role-based access control (`instructor` / `learner` / `admin`)
+- Bank secret number validated before payment
 
-## 📝 Project Requirements Checklist
+---
 
-- ✅ Three entities (Learner, Instructor, E-commerce Org)
-- ✅ 5 courses by 3 instructors
-- ✅ User authentication (login/register)
-- ✅ Bank information setup
-- ✅ Course viewing and enrollment
-- ✅ Payment processing with bank validation
-- ✅ Transaction recording
-- ✅ Certificate generation
-- ✅ Instructor payment on course upload
-- ✅ RESTful API design
-- ✅ Modern, beautiful UI
+## 🐛 Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| `Address already in use` on port 8000 | Run `fuser -k 8000/tcp` then retry |
+| `Cannot connect to MongoDB` | Make sure `mongod` is running |
+| Frontend shows blank page | Check backend is running on port 5000 |
+| Can't create course as instructor | Make sure you're logged in as **instructor** role |
+
+---
+
+## 📝 Changelog
+
+### v1.1.0 — Latest
+- ✅ Fixed: Instructors can now create courses even without an admin user in the DB
+- ✅ Added: Edit course (✏️) fully implemented with pre-filled form
+- ✅ Added: **PDF certificate download** (jsPDF, landscape A4, gold border design)
+- ✅ Fixed: Dashboard crash guards when API returns error objects
+- ✅ Fixed: Register page correctly hides bank info for instructors
+
+### v1.0.0
+- Initial release: auth, courses, enrollments, certificates, transactions
+
+---
 
 ## 🤝 Contributing
 
-This is a student project. Feel free to fork and modify for learning purposes.
+This is a student project. Fork it, learn from it, build on it!
 
 ## 📄 License
 
@@ -350,7 +360,4 @@ ISC
 
 ## 👨‍💻 Author
 
-Built with Ridoy Baidya ❤️ for LMS API Project Assignment
-
----
-
+Built with ❤️ by **Ridoy Baidya** — LMS API Assignment

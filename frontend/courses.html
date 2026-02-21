@@ -2,62 +2,67 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Courses - LMS</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courses - LMS</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="index.html" class="navbar-brand">🎓 LMS</a>
-            <ul class="navbar-menu">
-                <li><a href="courses.html" class="navbar-link">Courses</a></li>
-            </ul>
-        </div>
-    </nav>
+  <div class="bg-glow"></div>
 
-    <!-- Courses Section -->
-    <section class="py-5">
-        <div class="container">
-            <h1 class="text-center mb-3">Explore Our Courses</h1>
-            <p class="text-center mb-3" style="font-size: 1.125rem;">
-                Choose from our selection of expertly crafted courses
-            </p>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">🎓 LMS Platform</a>
+      <ul class="navbar-menu">
+        <li><a href="courses.html" class="navbar-link">Explore Courses</a></li>
+        <li><a href="login.html" class="navbar-link">Login</a></li>
+        <li><a href="register.html" class="btn btn-primary">Try for Free</a></li>
+      </ul>
+    </div>
+  </nav>
 
-            <div id="coursesGrid" class="grid grid-3">
-                <!-- Courses will be loaded here -->
-            </div>
-        </div>
-    </section>
+  <!-- Courses Section -->
+  <section class="py-5">
+    <div class="container">
+      <h1 class="text-center text-gradient mb-1">Master New Skills</h1>
+      <p class="text-center mb-3"
+        style="color: var(--text-secondary); max-width: 600px; margin-left: auto; margin-right: auto;">
+        Catalog of expert-led courses designed for your career growth.
+      </p>
 
-    <script src="js/api.js"></script>
-    <script src="js/utils.js"></script>
-    <script>
-        const coursesGrid = document.getElementById('coursesGrid');
+      <div id="coursesGrid" class="grid grid-3">
+        <!-- Courses will be loaded here -->
+      </div>
+    </div>
+  </section>
 
-        async function loadCourses() {
-            showLoading(coursesGrid);
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    const coursesGrid = document.getElementById('coursesGrid');
 
-            try {
-                const courses = await api.courses.getAll();
+    async function loadCourses() {
+      showLoading(coursesGrid);
 
-                if (courses.length === 0) {
-                    coursesGrid.innerHTML = '<p class="text-center">No courses available yet.</p>';
-                    return;
-                }
+      try {
+        const courses = await api.courses.getAll();
 
-                coursesGrid.innerHTML = courses.map(course => `
-          <div class="card">
+        if (courses.length === 0) {
+          coursesGrid.innerHTML = '<p class="text-center">No courses available yet.</p>';
+          return;
+        }
+
+        coursesGrid.innerHTML = courses.map(course => `
+          <div class="card card-glass slide-up">
             <div class="badge badge-primary mb-1">${course.category}</div>
-            <h3>${course.title}</h3>
+            <h3 style="margin-bottom: 0.5rem;">${course.title}</h3>
             <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: var(--spacing-sm);">
-              By ${course.instructor.name}
+              By ${course.instructor?.name || 'Expert'}
             </p>
-            <p>${course.description.substring(0, 120)}...</p>
+            <p style="font-size: 0.9375rem; line-height: 1.5;">${course.description.substring(0, 100)}...</p>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-md);">
               <div>
                 <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-light);">
@@ -68,23 +73,23 @@
                 </div>
               </div>
             </div>
-            <button onclick="viewCourse('${course._id}')" class="btn btn-primary mt-2" style="width: 100%;">
+            <button onclick="viewCourse('${course._id}')" class="btn btn-outline mt-2" style="width: 100%;">
               View Details
             </button>
           </div>
         `).join('');
-            } catch (error) {
-                coursesGrid.innerHTML = '<p class="text-center">Failed to load courses.</p>';
-                console.error(error);
-            }
-        }
+      } catch (error) {
+        coursesGrid.innerHTML = '<p class="text-center">Failed to load courses.</p>';
+        console.error(error);
+      }
+    }
 
-        function viewCourse(courseId) {
-            window.location.href = `course-details.html?id=${courseId}`;
-        }
+    function viewCourse(courseId) {
+      window.location.href = `course-details.html?id=${courseId}`;
+    }
 
-        loadCourses();
-    </script>
+    loadCourses();
+  </script>
 </body>
 
 </html>

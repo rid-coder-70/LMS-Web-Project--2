@@ -2,110 +2,112 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learner Dashboard - LMS</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- jsPDF for certificate PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learner Dashboard - LMS</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- jsPDF for certificate PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="index.html" class="navbar-brand">🎓 LMS</a>
-            <ul class="navbar-menu">
-                <li><a href="courses.html" class="navbar-link">Browse Courses</a></li>
-                <li><a href="learner-dashboard.html" class="navbar-link">Dashboard</a></li>
-                <li><button onclick="logout()" class="btn btn-outline">Logout</button></li>
-            </ul>
+  <div class="bg-glow"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">🎓 LMS Platform</a>
+      <ul class="navbar-menu">
+        <li><a href="courses.html" class="navbar-link">Explore Courses</a></li>
+        <li><a href="learner-dashboard.html" class="navbar-link">Dashboard</a></li>
+        <li><button onclick="logout()" class="btn btn-outline" style="padding: 0.5rem 1.25rem;">Logout</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Dashboard -->
+  <section class="py-5">
+    <div class="container">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+        <div>
+          <h1 id="welcomeText">Welcome back!</h1>
+          <p id="balanceText" style="font-size: 1.125rem; color: var(--text-muted);"></p>
         </div>
-    </nav>
+        <a href="courses.html" class="btn btn-primary">Browse More Courses</a>
+      </div>
 
-    <!-- Dashboard -->
-    <section class="py-5">
-        <div class="container">
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
-                <div>
-                    <h1 id="welcomeText">Welcome back!</h1>
-                    <p id="balanceText" style="font-size: 1.125rem; color: var(--text-muted);"></p>
-                </div>
-                <a href="courses.html" class="btn btn-primary">Browse More Courses</a>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="grid grid-3 mb-3">
-                <div class="card card-glass text-center">
-                    <h3 id="enrolledCount" class="text-gradient">0</h3>
-                    <p>Enrolled Courses</p>
-                </div>
-                <div class="card card-glass text-center">
-                    <h3 id="completedCount" class="text-gradient">0</h3>
-                    <p>Completed</p>
-                </div>
-                <div class="card card-glass text-center">
-                    <h3 id="certificatesCount" class="text-gradient">0</h3>
-                    <p>Certificates</p>
-                </div>
-            </div>
-
-            <!-- My Enrollments -->
-            <div class="card mb-3">
-                <h2 class="mb-2">My Courses</h2>
-                <div id="enrollmentsList" class="grid grid-2">
-                    <!-- Enrollments will be loaded here -->
-                </div>
-            </div>
-
-            <!-- Certificates -->
-            <div class="card mb-3">
-                <h2 class="mb-2">My Certificates</h2>
-                <div id="certificatesList">
-                    <!-- Certificates will be loaded here -->
-                </div>
-            </div>
-
-            <!-- Recent Transactions -->
-            <div class="card">
-                <h2 class="mb-2">Recent Transactions</h2>
-                <div id="transactionsList">
-                    <!-- Transactions will be loaded here -->
-                </div>
-            </div>
+      <!-- Stats Cards -->
+      <div class="grid grid-3 mb-3">
+        <div class="card card-glass text-center">
+          <h3 id="enrolledCount" class="text-gradient">0</h3>
+          <p>Enrolled Courses</p>
         </div>
-    </section>
+        <div class="card card-glass text-center">
+          <h3 id="completedCount" class="text-gradient">0</h3>
+          <p>Completed</p>
+        </div>
+        <div class="card card-glass text-center">
+          <h3 id="certificatesCount" class="text-gradient">0</h3>
+          <p>Certificates</p>
+        </div>
+      </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/utils.js"></script>
-    <script>
-        protectPage();
+      <!-- My Enrollments -->
+      <div class="card mb-3">
+        <h2 class="mb-2">My Courses</h2>
+        <div id="enrollmentsList" class="grid grid-2">
+          <!-- Enrollments will be loaded here -->
+        </div>
+      </div>
 
-        const user = getUser();
+      <!-- Certificates -->
+      <div class="card mb-3">
+        <h2 class="mb-2">My Certificates</h2>
+        <div id="certificatesList">
+          <!-- Certificates will be loaded here -->
+        </div>
+      </div>
 
-        if (!user || user.role !== 'learner') {
-            window.location.href = 'index.html';
-        }
+      <!-- Recent Transactions -->
+      <div class="card">
+        <h2 class="mb-2">Recent Transactions</h2>
+        <div id="transactionsList">
+          <!-- Transactions will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </section>
 
-        document.getElementById('welcomeText').textContent = `Welcome back, ${user.name}!`;
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    protectPage();
 
-        async function loadDashboard() {
-            // Load user info
-            const userInfo = await api.auth.getMe();
-            document.getElementById('balanceText').textContent = `Balance: ${formatCurrency(userInfo.balance)}`;
+    const user = getUser();
 
-            // Load enrollments
-            const enrollments = await api.enrollments.getMy();
-            document.getElementById('enrolledCount').textContent = enrollments.length;
-            document.getElementById('completedCount').textContent = enrollments.filter(e => e.completionStatus === 'completed').length;
+    if (!user || user.role !== 'learner') {
+      window.location.href = 'index.html';
+    }
 
-            const enrollmentsList = document.getElementById('enrollmentsList');
-            if (enrollments.length === 0) {
-                enrollmentsList.innerHTML = '<p>No courses enrolled yet. <a href="courses.html">Browse courses</a></p>';
-            } else {
-                enrollmentsList.innerHTML = enrollments.map(enrollment => `
+    document.getElementById('welcomeText').textContent = `Welcome back, ${user.name}!`;
+
+    async function loadDashboard() {
+      // Load user info
+      const userInfo = await api.auth.getMe();
+      document.getElementById('balanceText').textContent = `Balance: ${formatCurrency(userInfo.balance)}`;
+
+      // Load enrollments
+      const enrollments = await api.enrollments.getMy();
+      document.getElementById('enrolledCount').textContent = enrollments.length;
+      document.getElementById('completedCount').textContent = enrollments.filter(e => e.completionStatus === 'completed').length;
+
+      const enrollmentsList = document.getElementById('enrollmentsList');
+      if (enrollments.length === 0) {
+        enrollmentsList.innerHTML = '<p>No courses enrolled yet. <a href="courses.html">Browse courses</a></p>';
+      } else {
+        enrollmentsList.innerHTML = enrollments.map(enrollment => `
           <div class="card-glass" style="padding: var(--spacing-md);">
             <h4>${enrollment.course.title}</h4>
             <p style="font-size: 0.875rem; color: var(--text-muted);">
@@ -113,8 +115,8 @@
             </p>
             <div style="margin: var(--spacing-sm) 0;">
               ${enrollment.completionStatus === 'completed'
-                        ? '<span class="badge badge-success">Completed ✓</span>'
-                        : '<span class="badge badge-warning">In Progress</span>'}
+            ? '<span class="badge badge-success">Completed ✓</span>'
+            : '<span class="badge badge-warning">In Progress</span>'}
             </div>
             ${enrollment.completionStatus !== 'completed' ? `
               <button onclick="completeCourse('${enrollment._id}')" class="btn btn-success" style="width: 100%; margin-top: var(--spacing-sm);">
@@ -126,17 +128,17 @@
             </p>
           </div>
         `).join('');
-            }
+      }
 
-            // Load certificates
-            const certificates = await api.certificates.getMy();
-            document.getElementById('certificatesCount').textContent = certificates.length;
+      // Load certificates
+      const certificates = await api.certificates.getMy();
+      document.getElementById('certificatesCount').textContent = certificates.length;
 
-            const certificatesList = document.getElementById('certificatesList');
-            if (certificates.length === 0) {
-                certificatesList.innerHTML = '<p>No certificates yet. Complete a course to earn one!</p>';
-            } else {
-                certificatesList.innerHTML = certificates.map(cert => `
+      const certificatesList = document.getElementById('certificatesList');
+      if (certificates.length === 0) {
+        certificatesList.innerHTML = '<p>No certificates yet. Complete a course to earn one!</p>';
+      } else {
+        certificatesList.innerHTML = certificates.map(cert => `
           <div class="card-glass" style="padding: var(--spacing-md); margin-bottom: var(--spacing-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-sm);">
             <div>
               <h4>🏆 ${cert.course.title}</h4>
@@ -157,16 +159,16 @@
             </div>
           </div>
         `).join('');
-            }
+      }
 
-            // Load transactions
-            const transactions = await api.transactions.getMy();
-            const transactionsList = document.getElementById('transactionsList');
+      // Load transactions
+      const transactions = await api.transactions.getMy();
+      const transactionsList = document.getElementById('transactionsList');
 
-            if (transactions.length === 0) {
-                transactionsList.innerHTML = '<p>No transactions yet.</p>';
-            } else {
-                transactionsList.innerHTML = transactions.slice(0, 5).map(txn => `
+      if (transactions.length === 0) {
+        transactionsList.innerHTML = '<p>No transactions yet.</p>';
+      } else {
+        transactionsList.innerHTML = transactions.slice(0, 5).map(txn => `
           <div class="card-glass" style="padding: var(--spacing-md); margin-bottom: var(--spacing-sm); display: flex; justify-content: space-between; align-items: center;">
             <div>
               <h4 style="font-size: 1rem;">${txn.course.title}</h4>
@@ -182,155 +184,155 @@
             </div>
           </div>
         `).join('');
-            }
+      }
+    }
+
+    async function completeCourse(enrollmentId) {
+      try {
+        const result = await api.enrollments.complete(enrollmentId);
+
+        if (result.certificate) {
+          showToast('🎉 Congratulations! Certificate issued!', 'success');
+          loadDashboard(); // Reload dashboard
+        } else {
+          showToast(result.message || 'Failed to complete course', 'error');
         }
+      } catch (error) {
+        showToast('An error occurred', 'error');
+        console.error(error);
+      }
+    }
 
-        async function completeCourse(enrollmentId) {
-            try {
-                const result = await api.enrollments.complete(enrollmentId);
+    function downloadCertificate(certId, courseTitle, issuedDate, learnerName) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+      });
 
-                if (result.certificate) {
-                    showToast('🎉 Congratulations! Certificate issued!', 'success');
-                    loadDashboard(); // Reload dashboard
-                } else {
-                    showToast(result.message || 'Failed to complete course', 'error');
-                }
-            } catch (error) {
-                showToast('An error occurred', 'error');
-                console.error(error);
-            }
-        }
+      const W = doc.internal.pageSize.getWidth();
+      const H = doc.internal.pageSize.getHeight();
 
-        function downloadCertificate(certId, courseTitle, issuedDate, learnerName) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4',
-            });
+      // ── Background ──────────────────────────────────────────────
+      doc.setFillColor(10, 10, 30);
+      doc.rect(0, 0, W, H, 'F');
 
-            const W = doc.internal.pageSize.getWidth();
-            const H = doc.internal.pageSize.getHeight();
+      // ── Outer gold border ────────────────────────────────────────
+      doc.setDrawColor(212, 175, 55);
+      doc.setLineWidth(3);
+      doc.rect(8, 8, W - 16, H - 16);
 
-            // ── Background ──────────────────────────────────────────────
-            doc.setFillColor(10, 10, 30);
-            doc.rect(0, 0, W, H, 'F');
+      // ── Inner gold border ────────────────────────────────────────
+      doc.setLineWidth(0.8);
+      doc.rect(12, 12, W - 24, H - 24);
 
-            // ── Outer gold border ────────────────────────────────────────
-            doc.setDrawColor(212, 175, 55);
-            doc.setLineWidth(3);
-            doc.rect(8, 8, W - 16, H - 16);
+      // ── Purple gradient header band ──────────────────────────────
+      doc.setFillColor(88, 28, 135);
+      doc.rect(12, 12, W - 24, 38, 'F');
 
-            // ── Inner gold border ────────────────────────────────────────
-            doc.setLineWidth(0.8);
-            doc.rect(12, 12, W - 24, H - 24);
+      // Header accent line
+      doc.setDrawColor(212, 175, 55);
+      doc.setLineWidth(1);
+      doc.line(12, 50, W - 12, 50);
 
-            // ── Purple gradient header band ──────────────────────────────
-            doc.setFillColor(88, 28, 135);
-            doc.rect(12, 12, W - 24, 38, 'F');
+      // ── LMS brand in header ──────────────────────────────────────
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
+      doc.text('🎓 LMS', W / 2, 28, { align: 'center' });
 
-            // Header accent line
-            doc.setDrawColor(212, 175, 55);
-            doc.setLineWidth(1);
-            doc.line(12, 50, W - 12, 50);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(212, 175, 55);
+      doc.text('LEARNING MANAGEMENT SYSTEM', W / 2, 38, { align: 'center' });
 
-            // ── LMS brand in header ──────────────────────────────────────
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(22);
-            doc.setFont('helvetica', 'bold');
-            doc.text('🎓 LMS', W / 2, 28, { align: 'center' });
+      // ── "CERTIFICATE OF COMPLETION" title ────────────────────────
+      doc.setTextColor(212, 175, 55);
+      doc.setFontSize(28);
+      doc.setFont('helvetica', 'bold');
+      doc.text('CERTIFICATE OF COMPLETION', W / 2, 72, { align: 'center' });
 
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(212, 175, 55);
-            doc.text('LEARNING MANAGEMENT SYSTEM', W / 2, 38, { align: 'center' });
+      // ── Decorative line under title ──────────────────────────────
+      doc.setDrawColor(212, 175, 55);
+      doc.setLineWidth(0.5);
+      const lineW = 120;
+      doc.line(W / 2 - lineW / 2, 76, W / 2 + lineW / 2, 76);
 
-            // ── "CERTIFICATE OF COMPLETION" title ────────────────────────
-            doc.setTextColor(212, 175, 55);
-            doc.setFontSize(28);
-            doc.setFont('helvetica', 'bold');
-            doc.text('CERTIFICATE OF COMPLETION', W / 2, 72, { align: 'center' });
+      // ── "This is to certify that" ────────────────────────────────
+      doc.setTextColor(180, 180, 220);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'italic');
+      doc.text('This is to proudly certify that', W / 2, 92, { align: 'center' });
 
-            // ── Decorative line under title ──────────────────────────────
-            doc.setDrawColor(212, 175, 55);
-            doc.setLineWidth(0.5);
-            const lineW = 120;
-            doc.line(W / 2 - lineW / 2, 76, W / 2 + lineW / 2, 76);
+      // ── Learner name ─────────────────────────────────────────────
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(34);
+      doc.setFont('helvetica', 'bold');
+      doc.text(learnerName, W / 2, 110, { align: 'center' });
 
-            // ── "This is to certify that" ────────────────────────────────
-            doc.setTextColor(180, 180, 220);
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'italic');
-            doc.text('This is to proudly certify that', W / 2, 92, { align: 'center' });
+      // Underline
+      const nameWidth = doc.getTextWidth(learnerName);
+      doc.setDrawColor(212, 175, 55);
+      doc.setLineWidth(0.6);
+      doc.line(W / 2 - nameWidth / 2, 113, W / 2 + nameWidth / 2, 113);
 
-            // ── Learner name ─────────────────────────────────────────────
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(34);
-            doc.setFont('helvetica', 'bold');
-            doc.text(learnerName, W / 2, 110, { align: 'center' });
+      // ── "has successfully completed" ─────────────────────────────
+      doc.setTextColor(180, 180, 220);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'italic');
+      doc.text('has successfully completed the course', W / 2, 126, { align: 'center' });
 
-            // Underline
-            const nameWidth = doc.getTextWidth(learnerName);
-            doc.setDrawColor(212, 175, 55);
-            doc.setLineWidth(0.6);
-            doc.line(W / 2 - nameWidth / 2, 113, W / 2 + nameWidth / 2, 113);
+      // ── Course title ─────────────────────────────────────────────
+      doc.setTextColor(212, 175, 55);
+      doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
+      doc.text(courseTitle, W / 2, 142, { align: 'center' });
 
-            // ── "has successfully completed" ─────────────────────────────
-            doc.setTextColor(180, 180, 220);
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'italic');
-            doc.text('has successfully completed the course', W / 2, 126, { align: 'center' });
+      // ── Footer row: cert ID | trophy | date ──────────────────────
+      // Left — Certificate ID
+      doc.setTextColor(150, 150, 190);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Certificate ID', 35, 168);
+      doc.setTextColor(212, 175, 55);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text(certId, 35, 174);
 
-            // ── Course title ─────────────────────────────────────────────
-            doc.setTextColor(212, 175, 55);
-            doc.setFontSize(22);
-            doc.setFont('helvetica', 'bold');
-            doc.text(courseTitle, W / 2, 142, { align: 'center' });
+      // Center — Gold seal circle
+      doc.setFillColor(212, 175, 55);
+      doc.circle(W / 2, 173, 12, 'F');
+      doc.setFillColor(10, 10, 30);
+      doc.circle(W / 2, 173, 10, 'F');
+      doc.setTextColor(212, 175, 55);
+      doc.setFontSize(16);
+      doc.text('★', W / 2, 177, { align: 'center' });
 
-            // ── Footer row: cert ID | trophy | date ──────────────────────
-            // Left — Certificate ID
-            doc.setTextColor(150, 150, 190);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Certificate ID', 35, 168);
-            doc.setTextColor(212, 175, 55);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'bold');
-            doc.text(certId, 35, 174);
+      // Right — Issue date
+      doc.setTextColor(150, 150, 190);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Date of Issue', W - 35, 168, { align: 'right' });
+      doc.setTextColor(212, 175, 55);
+      doc.setFont('helvetica', 'bold');
+      doc.text(issuedDate, W - 35, 174, { align: 'right' });
 
-            // Center — Gold seal circle
-            doc.setFillColor(212, 175, 55);
-            doc.circle(W / 2, 173, 12, 'F');
-            doc.setFillColor(10, 10, 30);
-            doc.circle(W / 2, 173, 10, 'F');
-            doc.setTextColor(212, 175, 55);
-            doc.setFontSize(16);
-            doc.text('★', W / 2, 177, { align: 'center' });
+      // ── Bottom tagline ────────────────────────────────────────────
+      doc.setTextColor(80, 80, 120);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'italic');
+      doc.text('Issued by LMS | Learning Management System', W / 2, H - 16, { align: 'center' });
 
-            // Right — Issue date
-            doc.setTextColor(150, 150, 190);
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Date of Issue', W - 35, 168, { align: 'right' });
-            doc.setTextColor(212, 175, 55);
-            doc.setFont('helvetica', 'bold');
-            doc.text(issuedDate, W - 35, 174, { align: 'right' });
+      // ── Save ──────────────────────────────────────────────────────
+      const safeName = courseTitle.replace(/[^a-z0-9]/gi, '_');
+      doc.save(`Certificate_${safeName}_${certId}.pdf`);
 
-            // ── Bottom tagline ────────────────────────────────────────────
-            doc.setTextColor(80, 80, 120);
-            doc.setFontSize(8);
-            doc.setFont('helvetica', 'italic');
-            doc.text('Issued by LMS | Learning Management System', W / 2, H - 16, { align: 'center' });
+      showToast('📥 Certificate PDF downloaded!', 'success');
+    }
 
-            // ── Save ──────────────────────────────────────────────────────
-            const safeName = courseTitle.replace(/[^a-z0-9]/gi, '_');
-            doc.save(`Certificate_${safeName}_${certId}.pdf`);
-
-            showToast('📥 Certificate PDF downloaded!', 'success');
-        }
-
-        loadDashboard();
-    </script>
+    loadDashboard();
+  </script>
 </body>
 
 </html>

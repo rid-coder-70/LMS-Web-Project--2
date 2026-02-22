@@ -4,21 +4,15 @@ const Transaction = require('../models/Transaction');
 const Certificate = require('../models/Certificate');
 const { processBankTransaction } = require('../utils/bankSimulator');
 
-// @desc    Enroll in a course (with payment)
-// @route   POST /api/enrollments
-// @access  Private/Learner
 const enrollInCourse = async (req, res) => {
     try {
         const { courseId, secretNumber } = req.body;
 
-        // Check if course exists
         const course = await Course.findById(courseId).populate('instructor');
 
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
         }
-
-        // Check if already enrolled
         const existingEnrollment = await Enrollment.findOne({
             learner: req.user._id,
             course: courseId,
@@ -28,7 +22,6 @@ const enrollInCourse = async (req, res) => {
             return res.status(400).json({ message: 'Already enrolled in this course' });
         }
 
-        // Process bank transaction
         const bankResult = await processBankTransaction(
             req.user._id,
             course.instructor._id,
@@ -39,14 +32,12 @@ const enrollInCourse = async (req, res) => {
         if (!bankResult.success) {
             return res.status(400).json({ message: bankResult.message });
         }
-
-        // Create enrollment
+t
         const enrollment = await Enrollment.create({
             learner: req.user._id,
             course: courseId,
         });
 
-        // Create transaction record
         await Transaction.create({
             from: req.user._id,
             to: course.instructor._id,
@@ -56,7 +47,6 @@ const enrollInCourse = async (req, res) => {
             description: `Enrollment payment for course: ${course.title}`,
         });
 
-        // Update course enrollment count
         course.enrollmentCount += 1;
         await course.save();
 
@@ -70,9 +60,6 @@ const enrollInCourse = async (req, res) => {
     }
 };
 
-// @desc    Get learner's enrollments
-// @route   GET /api/enrollments/my
-// @access  Private/Learner
 const getMyEnrollments = async (req, res) => {
     try {
         const enrollments = await Enrollment.find({ learner: req.user._id })
@@ -91,9 +78,7 @@ const getMyEnrollments = async (req, res) => {
     }
 };
 
-// @desc    Mark course as completed and issue certificate
-// @route   PUT /api/enrollments/:id/complete
-// @access  Private/Learner
+
 const completeCourse = async (req, res) => {
     try {
         const enrollment = await Enrollment.findById(req.params.id).populate('course');
@@ -102,26 +87,21 @@ const completeCourse = async (req, res) => {
             return res.status(404).json({ message: 'Enrollment not found' });
         }
 
-        // Check if user is the learner
         if (enrollment.learner.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized' });
         }
 
-        // Check if already completed
         if (enrollment.completionStatus === 'completed') {
             return res.status(400).json({ message: 'Course already completed' });
         }
 
-        // Update enrollment
         enrollment.completionStatus = 'completed';
         enrollment.completedAt = Date.now();
         enrollment.certificateIssued = true;
         await enrollment.save();
 
-        // Generate ID manually to ensure validation passes
         const certificateId = `CERT-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-        // Issue certificate
         const certificate = await Certificate.create({
             learner: req.user._id,
             course: enrollment.course._id,

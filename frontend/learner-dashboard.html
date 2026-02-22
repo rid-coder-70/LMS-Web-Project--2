@@ -7,14 +7,12 @@
   <title>Learner Dashboard - LMS</title>
   <link rel="stylesheet" href="css/main.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- jsPDF for certificate PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
   <div class="bg-glow"></div>
 
-  <!-- Navigation -->
   <nav class="navbar">
     <div class="container">
       <a href="index.html" class="navbar-brand">🎓 LMS Platform</a>
@@ -26,8 +24,6 @@
       </ul>
     </div>
   </nav>
-
-  <!-- Dashboard -->
   <section class="py-5">
     <div class="container">
       <div
@@ -38,8 +34,6 @@
         </div>
         <a href="courses.html" class="btn btn-primary">Browse More Courses</a>
       </div>
-
-      <!-- Stats Cards -->
       <div class="grid grid-3 mb-3">
         <div class="card card-glass text-center">
           <h3 id="enrolledCount" class="text-gradient">0</h3>
@@ -54,29 +48,18 @@
           <p>Certificates</p>
         </div>
       </div>
-
-      <!-- My Enrollments -->
       <div class="card mb-3">
         <h2 class="mb-2">My Courses</h2>
-        <div id="enrollmentsList" class="grid grid-2">
-          <!-- Enrollments will be loaded here -->
-        </div>
+        <div id="enrollmentsList" class="grid grid-2"></div>
       </div>
-
-      <!-- Certificates -->
       <div class="card mb-3">
         <h2 class="mb-2">My Certificates</h2>
-        <div id="certificatesList">
-          <!-- Certificates will be loaded here -->
-        </div>
+        <div id="certificatesList"></div>
       </div>
 
-      <!-- Recent Transactions -->
       <div class="card">
         <h2 class="mb-2">Recent Transactions</h2>
-        <div id="transactionsList">
-          <!-- Transactions will be loaded here -->
-        </div>
+        <div id="transactionsList"></div>
       </div>
     </div>
   </section>
@@ -95,11 +78,8 @@
     document.getElementById('welcomeText').textContent = `Welcome back, ${user.name}!`;
 
     async function loadDashboard() {
-      // Load user info
       const userInfo = await api.auth.getMe();
       document.getElementById('balanceText').textContent = `Balance: ${formatCurrency(userInfo.balance)}`;
-
-      // Load enrollments
       const enrollments = await api.enrollments.getMy();
       document.getElementById('enrolledCount').textContent = enrollments.length;
       document.getElementById('completedCount').textContent = enrollments.filter(e => e.completionStatus === 'completed').length;
@@ -130,8 +110,6 @@
           </div>
         `).join('');
       }
-
-      // Load certificates
       const certificates = await api.certificates.getMy();
       document.getElementById('certificatesCount').textContent = certificates.length;
 
@@ -161,8 +139,6 @@
           </div>
         `).join('');
       }
-
-      // Load transactions
       const transactions = await api.transactions.getMy();
       const transactionsList = document.getElementById('transactionsList');
 
@@ -194,7 +170,7 @@
 
         if (result.certificate) {
           showToast('🎉 Congratulations! Certificate issued!', 'success');
-          loadDashboard(); // Reload dashboard
+          loadDashboard(); 
         } else {
           showToast(result.message || 'Failed to complete course', 'error');
         }
@@ -215,52 +191,37 @@
       const W = doc.internal.pageSize.getWidth();
       const H = doc.internal.pageSize.getHeight();
 
-      // ── Background (Clean White) ────────────────────────────────
       doc.setFillColor(255, 255, 255);
       doc.rect(0, 0, W, H, 'F');
 
-      // ── Top Blue Stripe (Kaggle Blue) ───────────────────────────
       doc.setFillColor(32, 190, 255);
       doc.rect(0, 0, W, 10, 'F');
 
-      // ── LMS Brand (Centered) ───────────────────────────────────
       doc.setTextColor(50, 50, 50);
       doc.setFontSize(26);
       doc.setFont('helvetica', 'bold');
       doc.text('LMS Platform', W / 2, 35, { align: 'center' });
 
-      // ── "CERTIFICATE OF COMPLETION" ──────────────────────────────
       doc.setTextColor(32, 190, 255);
       doc.setFontSize(32);
       doc.setFont('helvetica', 'bold');
       doc.text('CERTIFICATE OF COMPLETION', W / 2, 65, { align: 'center' });
 
-      // ── Main Content ───────────────────────────────────────────
       doc.setTextColor(80, 80, 80);
       doc.setFontSize(14);
       doc.setFont('helvetica', 'normal');
       doc.text('This is to certify that', W / 2, 85, { align: 'center' });
 
-      // Recipient Name
       doc.setTextColor(20, 20, 20);
       doc.setFontSize(38);
       doc.setFont('helvetica', 'bold');
       doc.text(learnerName, W / 2, 105, { align: 'center' });
 
-      doc.setTextColor(80, 80, 80);
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'normal');
-      doc.text('has successfully completed the Kaggle-certified course', W / 2, 120, { align: 'center' });
-
-      // Course Title
       doc.setTextColor(32, 190, 255);
       doc.setFontSize(26);
       doc.setFont('helvetica', 'bold');
       doc.text(courseTitle, W / 2, 140, { align: 'center' });
 
-      // ── Footer: Date, Signature, Verify ────────────────────────
-
-      // Signature Line
       doc.setDrawColor(200, 200, 200);
       doc.setLineWidth(0.5);
       doc.line(30, 175, 110, 175);
@@ -271,24 +232,19 @@
       doc.setFontSize(8);
       doc.text('Platform Director', 30, 184);
 
-      // Date
       doc.setTextColor(100, 100, 100);
       doc.setFontSize(10);
       doc.text('Issued on:', W - 90, 170);
       doc.setTextColor(20, 20, 20);
       doc.setFont('helvetica', 'bold');
       doc.text(issuedDate, W - 90, 175);
-
-      // Certificate ID (Small at the bottom)
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       doc.setFont('helvetica', 'normal');
       doc.text(`Verify this certificate at: lms.platform/verify/${certId}`, W / 2, H - 15, { align: 'center' });
       doc.text(`Certificate ID: ${certId}`, W / 2, H - 10, { align: 'center' });
 
-      // ── Decorative Official Seal (Badge) ─────────────────────────
       const bx = W - 50, by = 45;
-      // Scalloped seal shape
       doc.setFillColor(32, 190, 255);
       const points = 24, innerR = 14, outerR = 16;
       for (let i = 0; i < points * 2; i++) {
@@ -301,12 +257,10 @@
       }
       doc.fill();
 
-      // Inner white ring
       doc.setDrawColor(255, 255, 255);
       doc.setLineWidth(0.5);
       doc.circle(bx, by, 12, 'S');
 
-      // Seal Text
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
@@ -315,7 +269,6 @@
       doc.setFontSize(5);
       doc.text('CERTIFIED', bx, by + 6, { align: 'center' });
 
-      // ── Save ──────────────────────────────────────────────────────
       const safeName = courseTitle.replace(/[^a-z0-9]/gi, '_');
       doc.save(`Certificate_${safeName}_${certId}.pdf`);
 

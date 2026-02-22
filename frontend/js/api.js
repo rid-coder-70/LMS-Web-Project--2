@@ -1,18 +1,14 @@
-// API Configuration
+
 const API_URL = 'http://localhost:5000/api';
 
-// Get auth token
 const getToken = () => localStorage.getItem('token');
 
-// Set auth headers
 const authHeaders = () => ({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${getToken()}`,
 });
 
-// API Service
 const api = {
-    // Auth endpoints
     auth: {
         register: async (data) => {
             const response = await fetch(`${API_URL}/auth/register`, {
@@ -49,7 +45,6 @@ const api = {
         },
     },
 
-    // Course endpoints
     courses: {
         getAll: async () => {
             const response = await fetch(`${API_URL}/courses`);
@@ -95,7 +90,6 @@ const api = {
         },
     },
 
-    // Enrollment endpoints
     enrollments: {
         enroll: async (data) => {
             const response = await fetch(`${API_URL}/enrollments`, {
@@ -121,8 +115,6 @@ const api = {
             return response.json();
         },
     },
-
-    // Transaction endpoints
     transactions: {
         getMy: async () => {
             const response = await fetch(`${API_URL}/transactions/my`, {
@@ -139,7 +131,6 @@ const api = {
         },
     },
 
-    // Certificate endpoints
     certificates: {
         getMy: async () => {
             const response = await fetch(`${API_URL}/certificates/my`, {

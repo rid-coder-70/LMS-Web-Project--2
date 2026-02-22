@@ -1,8 +1,5 @@
 const Certificate = require('../models/Certificate');
 
-// @desc    Get learner's certificates
-// @route   GET /api/certificates/my
-// @access  Private/Learner
 const getMyCertificates = async (req, res) => {
     try {
         const certificates = await Certificate.find({ learner: req.user._id })
@@ -16,9 +13,6 @@ const getMyCertificates = async (req, res) => {
     }
 };
 
-// @desc    Get certificate by ID
-// @route   GET /api/certificates/:id
-// @access  Public
 const getCertificate = async (req, res) => {
     try {
         const certificate = await Certificate.findById(req.params.id)

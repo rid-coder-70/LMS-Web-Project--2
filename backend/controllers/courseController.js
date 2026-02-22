@@ -2,9 +2,6 @@ const Course = require('../models/Course');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 
-// @desc    Get all courses
-// @route   GET /api/courses
-// @access  Public
 const getCourses = async (req, res) => {
     try {
         const courses = await Course.find().populate('instructor', 'name email');
@@ -14,9 +11,6 @@ const getCourses = async (req, res) => {
     }
 };
 
-// @desc    Get single course
-// @route   GET /api/courses/:id
-// @access  Public
 const getCourse = async (req, res) => {
     try {
         const course = await Course.findById(req.params.id).populate('instructor', 'name email');
@@ -31,9 +25,6 @@ const getCourse = async (req, res) => {
     }
 };
 
-// @desc    Create a course
-// @route   POST /api/courses
-// @access  Private/Instructor
 const createCourse = async (req, res) => {
     try {
         const { title, description, price, materials, category, duration } = req.body;
@@ -48,7 +39,6 @@ const createCourse = async (req, res) => {
             duration: duration || '4 weeks',
         });
 
-        // Instructor payment from LMS organization (simulated) — optional if admin exists
         const lmsOrg = await User.findOne({ role: 'admin' });
         const instructorPayment = 500;
 
@@ -62,7 +52,6 @@ const createCourse = async (req, res) => {
                 description: `Payment for uploading course: ${course.title}`,
             });
 
-            // Update instructor balance
             const instructor = await User.findById(req.user._id);
             instructor.balance += instructorPayment;
             await instructor.save();
@@ -76,7 +65,6 @@ const createCourse = async (req, res) => {
             });
         }
 
-        // No admin / payment system — still return success
         res.status(201).json({
             course,
             payment: {
@@ -89,19 +77,14 @@ const createCourse = async (req, res) => {
     }
 };
 
-// @desc    Update a course
-// @route   PUT /api/courses/:id
-// @access  Private/Instructor
 const updateCourse = async (req, res) => {
     try {
         const course = await Course.findById(req.params.id);
 
         if (course) {
-            // Check if user is the course instructor
             if (course.instructor.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ message: 'Not authorized to update this course' });
             }
-
             course.title = req.body.title || course.title;
             course.description = req.body.description || course.description;
             course.price = req.body.price || course.price;
@@ -119,15 +102,11 @@ const updateCourse = async (req, res) => {
     }
 };
 
-// @desc    Delete a course
-// @route   DELETE /api/courses/:id
-// @access  Private/Instructor
 const deleteCourse = async (req, res) => {
     try {
         const course = await Course.findById(req.params.id);
 
         if (course) {
-            // Check if user is the course instructor
             if (course.instructor.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ message: 'Not authorized to delete this course' });
             }
@@ -142,9 +121,6 @@ const deleteCourse = async (req, res) => {
     }
 };
 
-// @desc    Get instructor's courses
-// @route   GET /api/courses/my/instructor
-// @access  Private/Instructor
 const getInstructorCourses = async (req, res) => {
     try {
         const courses = await Course.find({ instructor: req.user._id });

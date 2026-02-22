@@ -1,6 +1,3 @@
-// Utility Functions
-
-// Show toast notification
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -15,44 +12,37 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// Format currency
 function formatCurrency(amount) {
     if (amount === null || amount === undefined || isNaN(amount)) return '$0.00';
     return `$${Number(amount).toFixed(2)}`;
 }
 
-// Format date
 function formatDate(dateString) {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-// Get user from localStorage
 function getUser() {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
 }
 
-// Check if user is authenticated
 function isAuthenticated() {
     return !!localStorage.getItem('token');
 }
 
-// Logout function
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = 'index.html';
 }
 
-// Protect page (redirect if not authenticated)
 function protectPage() {
     if (!isAuthenticated()) {
         window.location.href = 'login.html';
     }
 }
 
-// Redirect based on role
 function redirectDashboard() {
     const user = getUser();
     if (!user) {
@@ -69,12 +59,10 @@ function redirectDashboard() {
     }
 }
 
-// Show/hide loading spinner
 function showLoading(element) {
     element.innerHTML = '<div class="spinner" style="margin: 2rem auto;"></div>';
 }
 
-// Create modal
 function createModal(title, content, onConfirm) {
     const modal = document.createElement('div');
     modal.className = 'modal active';
@@ -103,7 +91,6 @@ function createModal(title, content, onConfirm) {
     });
 }
 
-// Update navbar based on auth status
 function updateNavbar() {
     const navbar = document.querySelector('.navbar-menu');
     if (!navbar) return;
@@ -120,7 +107,6 @@ function updateNavbar() {
     }
 }
 
-// Call updateNavbar on page load
 if (document.querySelector('.navbar')) {
     updateNavbar();
 }

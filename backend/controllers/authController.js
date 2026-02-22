@@ -1,21 +1,16 @@
 const User = require('../models/User');
 const { generateToken } = require('../config/jwt');
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
 const register = async (req, res) => {
     try {
         const { name, email, password, role, bankAccountNumber, secretNumber } = req.body;
 
-        // Check if user exists
         const userExists = await User.findOne({ email });
 
         if (userExists) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Create user
         const user = await User.create({
             name,
             email,
@@ -41,14 +36,10 @@ const register = async (req, res) => {
     }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Check for user with password field
         const user = await User.findOne({ email }).select('+password');
 
         if (user && (await user.comparePassword(password))) {
@@ -68,9 +59,6 @@ const login = async (req, res) => {
     }
 };
 
-// @desc    Setup bank information
-// @route   PUT /api/auth/setup-bank
-// @access  Private
 const setupBank = async (req, res) => {
     try {
         const { bankAccountNumber, secretNumber } = req.body;
@@ -103,9 +91,6 @@ const setupBank = async (req, res) => {
     }
 };
 
-// @desc    Get current user profile
-// @route   GET /api/auth/me
-// @access  Private
 const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);

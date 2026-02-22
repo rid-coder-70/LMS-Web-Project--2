@@ -8,7 +8,6 @@ const Course = require('../models/Course');
 
 const seedData = async () => {
     try {
-        // Connect to MongoDB
         await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -16,7 +15,6 @@ const seedData = async () => {
 
         console.log('✅ MongoDB Connected');
 
-        // Clear existing data
         await User.deleteMany({});
         await Course.deleteMany({});
         await Enrollment.deleteMany({});
@@ -25,18 +23,16 @@ const seedData = async () => {
 
         console.log('🧹 Cleared existing data');
 
-        // Create LMS admin/organization
         const admin = await User.create({
             name: 'LMS Organization',
             email: 'admin@lms.com',
             password: 'admin123',
             role: 'admin',
-            balance: 50000, // Organization has funds to pay instructors
+            balance: 50000, 
         });
 
         console.log('✅ Created LMS Organization');
 
-        // Create 3 instructors
         const instructors = await User.create([
             {
                 name: 'John Smith',
@@ -66,7 +62,6 @@ const seedData = async () => {
 
         console.log('✅ Created 3 instructors');
 
-        // Create 5 courses
         const courses = await Course.create([
             {
                 title: 'Web Development Fundamentals',
@@ -130,7 +125,6 @@ const seedData = async () => {
         console.log('Secret Number: SECRET999');
         console.log('-----------------------------------');
 
-        // Create a test learner
         await User.create({
             name: 'Test Learner',
             email: 'learner@test.com',

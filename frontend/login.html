@@ -10,7 +10,6 @@
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
             <a href="index.html" class="navbar-brand">🎓 LMS</a>
@@ -21,7 +20,6 @@
         </div>
     </nav>
 
-    <!-- Login Form -->
     <section class="py-5">
         <div class="container" style="max-width: 500px;">
             <div class="card">
@@ -47,14 +45,6 @@
                     Don't have an account? <a href="register.html">Sign up here</a>
                 </p>
 
-                <!-- Test Accounts Info -->
-                <div class="card-glass mt-2" style="padding: var(--spacing-md);">
-                    <h4 style="font-size: 0.875rem; margin-bottom: var(--spacing-xs);">Test Accounts:</h4>
-                    <p style="font-size: 0.75rem; margin: 0;">
-                        <strong>Learner:</strong> learner@test.com / learner123<br>
-                        <strong>Instructor:</strong> john@instructor.com / instructor123
-                    </p>
-                </div>
             </div>
         </div>
     </section>
@@ -62,7 +52,6 @@
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
     <script>
-        // Redirect if already logged in
         if (isAuthenticated()) {
             redirectDashboard();
         }

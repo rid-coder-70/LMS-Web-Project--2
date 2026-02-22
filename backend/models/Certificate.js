@@ -22,7 +22,6 @@ const certificateSchema = new mongoose.Schema({
     },
 });
 
-// Generate unique certificate ID before saving
 certificateSchema.pre('save', function (next) {
     if (!this.certificateId) {
         this.certificateId = `CERT-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;

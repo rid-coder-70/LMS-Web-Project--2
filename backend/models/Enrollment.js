@@ -30,7 +30,6 @@ const enrollmentSchema = new mongoose.Schema({
     },
 });
 
-// Prevent duplicate enrollments
 enrollmentSchema.index({ learner: 1, course: 1 }, { unique: true });
 
 module.exports = mongoose.model('Enrollment', enrollmentSchema);

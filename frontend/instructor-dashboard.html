@@ -11,8 +11,6 @@
 
 <body>
   <div class="bg-glow"></div>
-
-  <!-- Navigation -->
   <nav class="navbar">
     <div class="container">
       <a href="index.html" class="navbar-brand">🎓 LMS Platform</a>
@@ -25,7 +23,6 @@
     </div>
   </nav>
 
-  <!-- Dashboard -->
   <section class="py-5">
     <div class="container">
       <div
@@ -37,7 +34,6 @@
         <button onclick="showCreateCourseModal()" class="btn btn-primary">+ Create New Course</button>
       </div>
 
-      <!-- Stats -->
       <div class="grid grid-3 mb-3">
         <div class="card card-glass text-center">
           <h3 id="coursesCount" class="text-gradient">0</h3>
@@ -52,13 +48,9 @@
           <p>Total Earnings</p>
         </div>
       </div>
-
-      <!-- My Courses -->
       <div class="card">
         <h2 class="mb-2">My Courses</h2>
-        <div id="coursesList" class="grid grid-2">
-          <!-- Courses will be loaded here -->
-        </div>
+        <div id="coursesList" class="grid grid-2"></div>
       </div>
     </div>
   </section>
@@ -81,14 +73,10 @@
       coursesList.innerHTML = '<div class="spinner" style="margin: 2rem auto;"></div>';
 
       try {
-        // Load user info
         const userInfo = await api.auth.getMe();
         document.getElementById('balanceText').textContent = `Earnings: ${formatCurrency(userInfo.balance)}`;
 
-        // Load instructor's courses
         const courses = await api.courses.getInstructorCourses();
-
-        // Guard: courses must be an array
         if (!Array.isArray(courses)) {
           coursesList.innerHTML = `<p style="color:var(--danger);">Failed to load courses: ${courses.message || 'Unknown error'}</p>`;
           return;
